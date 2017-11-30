@@ -1,0 +1,8 @@
+{
+  "name": "semantic-release-github-pr",
+  "version": "1.0.0",
+  "description": " A `semantic-release` plugin that creates a changelog comment on Github PRs.",
+  "main": "index.js",
+  "repository": "https://github.com/Updater/semantic-release-github-pr.git",
+  "license": "MIT"
+}
