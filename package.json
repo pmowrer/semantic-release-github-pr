@@ -4,5 +4,11 @@
   "description": " A `semantic-release` plugin that creates a changelog comment on Github PRs.",
   "main": "index.js",
   "repository": "https://github.com/Updater/semantic-release-github-pr.git",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@semantic-release/github": "^2.0.0",
+    "github": "^12.1.0",
+    "parse-github-url": "^1.0.1",
+    "read-pkg": "^3.0.0"
+  }
 }
