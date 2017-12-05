@@ -49,7 +49,7 @@ const createPrChangelog = async (
 
   // We want to comment on any PR of the given branch/head combo.
   openPullRequests
-    .filter(({ head: sha }) => sha === gitHead)
+    .filter(({ head: sha }) => sha !== gitHead)
     .forEach(async ({ number, title }) => {
       const { data: comments } = await getIssueComments({ number });
 
