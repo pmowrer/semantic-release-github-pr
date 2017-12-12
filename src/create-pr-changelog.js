@@ -48,8 +48,13 @@ const createPrChangelog = async (
   });
 
   // We want to comment on any PR of the given branch/head combo.
+  // Depending on whether we run on a "pr" or a "push", `gitHead` on CI may be either
+  // of `sha` (branch's HEAD) or `merge_commit_sha` (Github's "test merge commit").
+  // https://developer.github.com/v3/pulls/#response-1
   openPullRequests
-    .filter(({ head: sha }) => sha !== gitHead)
+    .filter(({ head: { sha }, merge_commit_sha }) =>
+      [gitHead, merge_commit_sha].includes(sha)
+    )
     .forEach(async ({ number, title }) => {
       const { data: comments } = await getIssueComments({ number });
 
