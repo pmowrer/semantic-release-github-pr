@@ -1,3 +1,4 @@
+const debug = require('debug')('semantic-release:github-pr');
 const readPkg = require('read-pkg');
 
 const partiallyApplyParams = params1 => fns =>
@@ -12,6 +13,16 @@ const createCommentTag = async () => {
   return `[//]: # (semantic-release-github-pr-${packageName})\n`;
 };
 
+const isPrFor = gitHead => ({ head: { sha }, merge_commit_sha, title }) => {
+  const result = [sha, merge_commit_sha].includes(gitHead);
+  debug(`Matching branch against PR: %o`, title);
+  debug(`Branch gitHead: %o`, gitHead);
+  debug(`PR sha: %o`, sha);
+  debug(`PR merge_commit_sha: %o`, merge_commit_sha);
+  debug(`Is PR a match? %o`, result);
+  return result;
+};
+
 const createPrChangelog = async (
   github,
   { branch, gitHead, logger, notes, owner, repo }
@@ -20,7 +31,7 @@ const createPrChangelog = async (
   const commentTag = await createCommentTag();
 
   // All of the Github API calls we're making require passing `owner` and `repo`.
-  // To
+  // The following section partially applies these args for all API functions used.
   let {
     issues: {
       createComment: createIssueComment,
@@ -52,9 +63,7 @@ const createPrChangelog = async (
   // of `sha` (branch's HEAD) or `merge_commit_sha` (Github's "test merge commit").
   // https://developer.github.com/v3/pulls/#response-1
   openPullRequests
-    .filter(({ head: { sha }, merge_commit_sha }) =>
-      [gitHead, merge_commit_sha].includes(sha)
-    )
+    .filter(isPrFor(gitHead))
     .forEach(async ({ number, title }) => {
       const { data: comments } = await getIssueComments({ number });
 
