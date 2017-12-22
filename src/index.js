@@ -1,6 +1,6 @@
 const parseGithubUrl = require('parse-github-url');
-const githubInit = require('./src/github-init');
-const createPrChangelog = require('./src/create-pr-changelog');
+const githubInit = require('./github-init');
+const createPrChangelog = require('./create-pr-changelog');
 
 const plugin = async (
   pluginConfig,

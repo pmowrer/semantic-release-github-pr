@@ -7,7 +7,7 @@ const args = argv
   .slice(2)
   .concat([
     '--verify-conditions=@semantic-release/github',
-    `--publish=${resolve(__dirname, '../index.js')}`,
+    `--publish=${resolve(__dirname, '../src/index.js')}`,
   ]);
 
 execa('semantic-release', args, { stdio: 'inherit' });
