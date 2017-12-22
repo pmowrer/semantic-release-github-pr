@@ -1,8 +1,6 @@
 const debug = require('debug')('semantic-release:github-pr');
 const readPkg = require('read-pkg');
-
-const partiallyApplyParams = params1 => fns =>
-  fns.map(fn => params2 => fn({ ...params1, ...params2 }));
+const githubRepo = require('./github-repo');
 
 const header = 'Merging this PR will publish the following release:\n\n';
 
@@ -27,33 +25,10 @@ const createPrChangelog = async (
   github,
   { branch, gitHead, logger, notes, owner, repo }
 ) => {
-  const partiallyApplyRepoAndOwner = partiallyApplyParams({ owner, repo });
+  const git = githubRepo(github, { owner, repo });
   const commentTag = await createCommentTag();
 
-  // All of the Github API calls we're making require passing `owner` and `repo`.
-  // The following section partially applies these args for all API functions used.
-  let {
-    issues: {
-      createComment: createIssueComment,
-      deleteComment: deleteIssueComment,
-      getComments: getIssueComments,
-    },
-    pullRequests: { getAll: getAllPullRequests },
-  } = github;
-
-  [
-    createIssueComment,
-    deleteIssueComment,
-    getAllPullRequests,
-    getIssueComments,
-  ] = partiallyApplyRepoAndOwner([
-    createIssueComment,
-    deleteIssueComment,
-    getAllPullRequests,
-    getIssueComments,
-  ]);
-
-  const { data: openPullRequests = [] } = await getAllPullRequests({
+  const { data: openPullRequests = [] } = await git.getAllPullRequests({
     base: branch,
     state: 'open',
   });
@@ -65,13 +40,13 @@ const createPrChangelog = async (
   openPullRequests
     .filter(isPrFor(gitHead))
     .forEach(async ({ number, title }) => {
-      const { data: comments } = await getIssueComments({ number });
+      const { data: comments } = await git.getIssueComments({ number });
 
       // To keep from spamming each PR with comments, we identify any previous
       // comments posted by this plugin (using `commentTag`) and delete them.
       comments.forEach(async ({ id, body }) => {
         if (body.includes(commentTag)) {
-          await deleteIssueComment({ id });
+          await git.deleteIssueComment({ id });
         }
       });
 
@@ -79,7 +54,7 @@ const createPrChangelog = async (
       // To create a general PR comment (unassociated with a line number),
       // you must create it on the corresponding issue that GitHub creates.
       // https://stackoverflow.com/questions/16744069/create-comment-on-pull-request
-      await createIssueComment({
+      await git.createIssueComment({
         number,
         body: commentTag + header + notes,
       });
