@@ -27,7 +27,7 @@
     "husky": "^0.14.3",
     "lint-staged": "^6.0.0",
     "prettier": "^1.8.2",
-    "semantic-release": "^11.0.0"
+    "semantic-release": "^11.1.0"
   },
   "lint-staged": {
     "*.js": [
