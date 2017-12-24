@@ -25,17 +25,6 @@
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/@semantic-release/error/-/error-2.1.0.tgz#44771f676f5b148da309111285a97901aa95a6e0"
 
-"@semantic-release/github@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@semantic-release/github/-/github-2.0.0.tgz#27b31eb5b1555c125eb9d8af86f77597b8975e8f"
-  dependencies:
-    "@semantic-release/error" "^2.1.0"
-    debug "^3.1.0"
-    fs-extra "^4.0.2"
-    github "^12.0.5"
-    p-each-series "^1.0.0"
-    parse-github-url "^1.0.1"
-
 "@semantic-release/github@^3.0.0":
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/@semantic-release/github/-/github-3.0.0.tgz#364bec879b4bc0955635866585514df0b4e640c0"
@@ -791,7 +780,7 @@ git-url-parse@^7.0.1:
   dependencies:
     git-up "^2.0.0"
 
-github@^12.0.0, github@^12.0.5, github@^12.1.0:
+github@^12.0.0, github@^12.1.0:
   version "12.1.0"
   resolved "https://registry.yarnpkg.com/github/-/github-12.1.0.tgz#f2a2dcbd441178155942257491a4bc08bf661dd7"
   dependencies:
@@ -1550,12 +1539,6 @@ osenv@^0.1.4:
   dependencies:
     os-homedir "^1.0.0"
     os-tmpdir "^1.0.0"
-
-p-each-series@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/p-each-series/-/p-each-series-1.0.0.tgz#930f3d12dd1f50e7434457a22cd6f04ac6ad7f71"
-  dependencies:
-    p-reduce "^1.0.0"
 
 p-finally@^1.0.0:
   version "1.0.0"
