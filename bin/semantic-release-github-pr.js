@@ -2,12 +2,13 @@
 const execa = require('execa');
 const { argv } = process;
 const { resolve } = require('path');
+const plugins = `${resolve(__dirname, '../src/index.js')}`;
 
 const args = argv
   .slice(2)
   .concat([
-    '--verify-conditions=@semantic-release/github',
-    `--publish=${resolve(__dirname, '../index.js')}`,
+    `--verify-conditions=@semantic-release/github,${plugins}`,
+    `--publish=${plugins}`,
   ]);
 
 execa('semantic-release', args, { stdio: 'inherit' });
