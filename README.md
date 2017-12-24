@@ -46,21 +46,23 @@ Default configuration (as encapsulated in [the `semantic-release-github-pr` comm
 ```
 
 ## CI
-This plugin is best used with a CI build process to fully automate the posting of comments in Github PRs. Ideally, it should run whenever a relevant PR is opened.
+This plugin is best used with a CI build process to fully automate the posting of comments in Github PRs. Ideally, it should run whenever a PR is opened/updated.
 
 ### Travis
-By default, Travis will trigger a build whenever a PR is opened (pr) or updated (push) in the corresponding Github repo. 
+To only run when necessary, we use the [`$TRAVIS_PULL_REQUEST`](https://docs.travis-ci.com/user/environment-variables/#Convenience-Variables) environment variable to detect whether the build is a ["pull request build"](https://docs.travis-ci.com/user/pull-requests/).
 
 ```yaml
 after_success:
-  - "npx semantic-release-github-pr"
+  - "[[ $TRAVIS_PULL_REQUEST != 'false' ]] npx semantic-release-github-pr"
 ```
 
 ### CircleCI
-Unfortunately, CircleCI only supports building on push, [not when a PR is created](https://discuss.circleci.com/t/trigger-new-build-on-pr/4219). This limits the usefulness of the plugin somewhat, as a build will have to be triggered manually after a PR is opened.
+To only run when necessary, we use the [`$CI_PULL_REQUEST`](https://circleci.com/docs/1.0/environment-variables/#build-details) environment variable to detect whether the build has a corresponding pull request.
+
+Unfortunately, CircleCI only supports building on push, [not when a PR is created](https://discuss.circleci.com/t/trigger-new-build-on-pr/4219). This limits the usefulness of the plugin somewhat, as a build will have to be triggered manually after a PR is opened for the changelog to post.
 
 ```yaml
 test:
   post:
-    - "npx semantic-release-github-pr"
+    - "[[ $CI_PULL_REQUEST != '' ]] npx semantic-release-github-pr"
 ```
