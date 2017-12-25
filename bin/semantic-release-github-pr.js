@@ -7,6 +7,7 @@ const plugins = `${resolve(__dirname, '../src/index.js')}`;
 const args = argv
   .slice(2)
   .concat([
+    `--analyze-commits=${plugins}`,
     `--verify-conditions=@semantic-release/github,${plugins}`,
     `--publish=${plugins}`,
   ]);

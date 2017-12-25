@@ -1895,6 +1895,13 @@ safe-buffer@^5.0.1, safe-buffer@^5.1.0, safe-buffer@^5.1.1, safe-buffer@~5.1.0, 
   version "5.1.1"
   resolved "https://registry.yarnpkg.com/safe-buffer/-/safe-buffer-5.1.1.tgz#893312af69b2123def71f57889001671eeb2c853"
 
+semantic-release-plugin-decorators@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/semantic-release-plugin-decorators/-/semantic-release-plugin-decorators-1.2.0.tgz#7371b14f67c2aa78d559adc3433679e304e7ade6"
+  dependencies:
+    import-from "^2.1.0"
+    lodash "^4.17.4"
+
 semantic-release@^11.1.0:
   version "11.1.0"
   resolved "https://registry.yarnpkg.com/semantic-release/-/semantic-release-11.1.0.tgz#db0316065d7612d1db5a2e26aaa0c3f7edebb6c3"
