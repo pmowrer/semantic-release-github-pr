@@ -2,13 +2,13 @@ const githubInit = require('./github-init');
 const githubRepo = require('./github-repo');
 const parseGithubUrl = require('parse-github-url');
 
-const withGithub = plugin => (pluginConfig, options) => {
+const withGithub = plugin => (pluginConfig, config) => {
   const github = githubInit(pluginConfig);
-  const { options: { repositoryUrl } } = options;
+  const { options: { repositoryUrl } } = config;
   const { name: repo, owner } = parseGithubUrl(repositoryUrl);
 
   return plugin(pluginConfig, {
-    ...options,
+    ...config,
     githubRepo: githubRepo(github, { owner, repo }),
   });
 };

@@ -19,7 +19,8 @@
     "github": "^12.1.0",
     "parse-github-url": "^1.0.1",
     "ramda": "^0.25.0",
-    "read-pkg": "^3.0.0"
+    "read-pkg": "^3.0.0",
+    "semantic-release-plugin-decorators": "^1.2.0"
   },
   "devDependencies": {
     "debug": "^3.1.0",
