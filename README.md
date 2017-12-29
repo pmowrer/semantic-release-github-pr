@@ -79,9 +79,8 @@ To run only when necessary, we use the [`$CI_PULL_REQUEST`](https://circleci.com
 Unfortunately, CircleCI only supports building on push, [not when a PR is created](https://discuss.circleci.com/t/trigger-new-build-on-pr/4219). This limits the usefulness of the plugin somewhat, as a build will have to be triggered manually after a PR is opened for the changelog to post.
 
 ```yaml
-test:README.md:21
-  post:
-    - "[[ $CI_PULL_REQUEST != '' ]] && npx semantic-release-github-pr"
+post:
+  - "[[ $CI_PULL_REQUEST != '' ]] && npx semantic-release-github-pr"
 ```
 
 ### Advanced
