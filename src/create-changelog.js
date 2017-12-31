@@ -1,3 +1,5 @@
+const { create } = require('./comment-tag');
+
 const HEADER = {
   RELEASE: 'Merging this PR will publish the following release:\n\n',
   NO_RELEASE: 'Merging this PR will **not** publish a release.',
@@ -11,12 +13,14 @@ const HEADER = {
  * @param logger
  * @param notes
  */
-const createChangelog = (commentTag, githubRepo, logger, notes) => async ({
-  number,
-  title,
-}) => {
+const createChangelog = (
+  { githubRepo, npmPackage: { name: npmPackageName } },
+  { logger, nextRelease: { gitHead, gitTag = null, notes } }
+) => async ({ number, title }) => {
   const body =
-    commentTag + (notes ? HEADER.RELEASE + notes : HEADER.NO_RELEASE);
+    create(gitHead, npmPackageName, gitTag) +
+    '\n' +
+    (notes ? HEADER.RELEASE + notes : HEADER.NO_RELEASE);
 
   logger.log(`Creating changelog comment on PR "${title}"`);
 
