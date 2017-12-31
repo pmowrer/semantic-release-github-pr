@@ -6,7 +6,7 @@ const withCommentTag = plugin => async (pluginConfig, config) => {
   const { name: packageName } = await readPkg();
   const commentTag = `[//]: # (semantic-release-github-pr-${packageName})\n`;
 
-  return plugin(pluginConfig, { ...config, commentTag });
+  return plugin({ ...pluginConfig, commentTag }, config);
 };
 
 module.exports = withCommentTag;

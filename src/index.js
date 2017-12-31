@@ -20,9 +20,12 @@ const decoratePlugins = compose(
 // Use `verifyConditions` plugin as a hook to clean up stale changelog comments.
 // We can't do this in `publish` since it only runs if there's a new release.
 const verifyConditions = async (
-  pluginConfig,
-  { commentTag, githubRepo, logger, pullRequests }
+  { commentTag, githubRepo, pullRequests },
+  { logger }
 ) => {
+  // Delete all where git head doesn't match
+  // Delete any "no release comment"
+  // Delete all where package ma
   await pullRequests.forEach(deleteChangelog(commentTag, githubRepo, logger));
 };
 
@@ -33,11 +36,12 @@ const analyzeCommits = wrapPlugin(
   NAMESPACE,
   'analyzeCommits',
   plugin => async (pluginConfig, config) => {
-    const { dryRun } = pluginConfig;
+    const { dryRun, commentTag, pullRequests } = pluginConfig;
     const nextRelease = await plugin(pluginConfig, config);
 
     if (!nextRelease && !dryRun) {
-      const { commentTag, githubRepo, logger, pullRequests } = config;
+      // Create "no release" comment
+      const { logger } = config;
       await pullRequests.forEach(
         createChangelog(commentTag, githubRepo, logger, null)
       );
@@ -49,10 +53,11 @@ const analyzeCommits = wrapPlugin(
 );
 
 const publish = async (
-  pluginConfig,
-  { commentTag, githubRepo, logger, pullRequests, nextRelease: { notes } }
+  { commentTag, githubRepo, pullRequests },
+  { logger, nextRelease: { notes } }
 ) => {
   await pullRequests.forEach(
+    // Create "release" comment
     createChangelog(commentTag, githubRepo, logger, notes)
   );
 };

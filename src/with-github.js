@@ -7,10 +7,13 @@ const withGithub = plugin => (pluginConfig, config) => {
   const { options: { repositoryUrl } } = config;
   const { name: repo, owner } = parseGithubUrl(repositoryUrl);
 
-  return plugin(pluginConfig, {
-    ...config,
-    githubRepo: githubRepo(github, { owner, repo }),
-  });
+  return plugin(
+    {
+      ...pluginConfig,
+      githubRepo: githubRepo(github, { owner, repo }),
+    },
+    config
+  );
 };
 
 module.exports = withGithub;
