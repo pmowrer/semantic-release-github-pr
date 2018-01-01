@@ -9,3 +9,4 @@ before_install:
 after_success:
   - "[[ $TRAVIS_PULL_REQUEST != 'false' ]] && node ./bin/semantic-release-github-pr --debug"
   - npx semantic-release --debug
+cache: yarn
