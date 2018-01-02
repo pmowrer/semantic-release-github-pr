@@ -1,3 +1,4 @@
+const debug = require('debug')('semantic-release:github-pr');
 const { parse } = require('./comment-tag');
 
 /**
@@ -15,12 +16,21 @@ const { parse } = require('./comment-tag');
  */
 const matchStaleComment = (gitHead, npmPackageName) => comment => {
   const result = parse(comment);
-  return (
-    result &&
-    (!result.matchesGitHead(gitHead) ||
-      result.matchesPackageName(npmPackageName) ||
-      result.matchesGitTag(null))
-  );
+
+  debug(`Comment is a PR changelog: %o`, !!result);
+  if (!result) {
+    return false;
+  }
+
+  const matchesGitHead = result.matchesGitHead(gitHead);
+  const matchesPackageName = result.matchesPackageName(npmPackageName);
+  const isNoRelease = result.matchesGitTag('null');
+
+  debug(`Comment matches git head: %o`, matchesGitHead);
+  debug(`Comment matches npm package name: %o`, matchesPackageName);
+  debug(`Comment is "no release" comment: %o`, isNoRelease);
+
+  return !matchesGitHead || matchesPackageName || isNoRelease;
 };
 
 /**
@@ -40,6 +50,7 @@ const deleteChangelog = (
   const isStaleComment = matchStaleComment(gitHead, npmPackageName);
 
   comments.forEach(async ({ id, body }) => {
+    debug(`Checking PR comment %o for stale changelog message...`, id);
     if (isStaleComment(body)) {
       logger.log(`Deleting stale changelog comment on PR "${title}"`);
       await githubRepo.deleteIssueComment({ id });
