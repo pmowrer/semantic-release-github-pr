@@ -32,12 +32,11 @@ const analyzeCommits = wrapPlugin(
   NAMESPACE,
   'analyzeCommits',
   plugin => async (pluginConfig, config) => {
-    const { dryRun, commentTag, pullRequests } = pluginConfig;
+    const { dryRun, pullRequests } = pluginConfig;
     const nextRelease = await plugin(pluginConfig, config);
 
     if (!nextRelease && !dryRun) {
       // Create "no release" comment
-      const { logger } = config;
       await pullRequests.forEach(createChangelog(pluginConfig, config));
     }
 
