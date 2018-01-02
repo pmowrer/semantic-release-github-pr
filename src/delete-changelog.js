@@ -24,7 +24,7 @@ const matchStaleComment = (gitHead, npmPackageName) => comment => {
 
   const matchesGitHead = result.matchesGitHead(gitHead);
   const matchesPackageName = result.matchesPackageName(npmPackageName);
-  const isNoRelease = result.matchesGitTag(null);
+  const isNoRelease = result.matchesGitTag('null');
 
   debug(`Comment matches git head: %o`, matchesGitHead);
   debug(`Comment matches npm package name: %o`, matchesPackageName);
