@@ -2,6 +2,7 @@ const { compose } = require('ramda');
 const { wrapPlugin } = require('semantic-release-plugin-decorators');
 const pluginDefinitions = require('semantic-release/lib/plugins/definitions');
 
+const { parse } = require('./comment-tag');
 const createChangelog = require('./create-changelog');
 const deleteChangelog = require('./delete-changelog');
 const withGithub = require('./with-github');
@@ -32,13 +33,24 @@ const analyzeCommits = wrapPlugin(
   NAMESPACE,
   'analyzeCommits',
   plugin => async (pluginConfig, config) => {
-    const { dryRun, commentTag, pullRequests } = pluginConfig;
+    const { dryRun, githubRepo, pullRequests } = pluginConfig;
     const nextRelease = await plugin(pluginConfig, config);
 
     if (!nextRelease && !dryRun) {
-      // Create "no release" comment
-      const { logger } = config;
-      await pullRequests.forEach(createChangelog(pluginConfig, config));
+      await pullRequests.forEach(async pr => {
+        const { number } = pr;
+        const createChangelogOnPr = createChangelog(pluginConfig, config);
+        const { data: comments } = await githubRepo.getIssueComments({
+          number,
+        });
+
+        // Create "no release" comment if there are no other comments posted
+        // by this set of plugins. We want to avoid duplicating the "no release"
+        // comment and/or posting it when another package has a release (monorepo).
+        if (!comments.some(comment => !!parse(comment.body))) {
+          createChangelogOnPr(pr);
+        }
+      });
     }
 
     return nextRelease;
