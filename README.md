@@ -70,7 +70,7 @@ To only run when necessary, we use the [`$TRAVIS_PULL_REQUEST`](https://docs.tra
 
 ```yaml
 after_success:
-  - "[[ $TRAVIS_PULL_REQUEST != 'false' ]] && npx semantic-release-github-pr"
+  - "[[ $TRAVIS_PULL_REQUEST != 'false' ]] && npx semantic-release-github-pr || exit 0"
 ```
 
 #### CircleCI
@@ -80,7 +80,7 @@ Unfortunately, CircleCI only supports building on push, [not when a PR is create
 
 ```yaml
 post:
-  - "[[ $CI_PULL_REQUEST != '' ]] && npx semantic-release-github-pr"
+  - "[[ $CI_PULL_REQUEST != '' ]] && npx semantic-release-github-pr || exit 0"
 ```
 
 ### Advanced
