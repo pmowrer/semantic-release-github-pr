@@ -20,14 +20,14 @@ const decoratePlugins = compose(
 );
 
 // Use `verifyConditions` plugin as a hook to clean up stale changelog comments.
-// We can't do this in `publish` since it only runs if there's a new release.
+// We can't do this in `generateNotes` since it only runs if there's a new release.
 const verifyConditions = async (pluginConfig, config) => {
   const { pullRequests } = pluginConfig;
   await pullRequests.forEach(deleteChangelog(pluginConfig, config));
 };
 
 // Use `analyzeCommits` plugin as a hook to post a "no release" PR comment if
-// there isn't a new release. We can't do this in `publish` since it only runs
+// there isn't a new release. We can't do this in `generateNotes` since it only runs
 // if there's a new release.
 const analyzeCommits = wrapPlugin(
   NAMESPACE,
@@ -58,16 +58,27 @@ const analyzeCommits = wrapPlugin(
   pluginDefinitions.analyzeCommits.default
 );
 
-const publish = async (pluginConfig, config) => {
-  const { pullRequests } = pluginConfig;
-  await pullRequests.forEach(
-    // Create "release" comment
-    createChangelog(pluginConfig, config)
-  );
-};
+const generateNotes = wrapPlugin(
+  NAMESPACE,
+  'generateNotes',
+  plugin => async (pluginConfig, config) => {
+    const { pullRequests } = pluginConfig;
+    const { nextRelease } = config;
+
+    nextRelease.notes = await plugin(pluginConfig, config);
+
+    await pullRequests.forEach(
+      // Create "release" comment
+      createChangelog(pluginConfig, { ...config, nextRelease })
+    );
+
+    return nextRelease.notes;
+  },
+  pluginDefinitions.generateNotes.default
+);
 
 module.exports = {
   analyzeCommits: decoratePlugins(analyzeCommits),
-  publish: decoratePlugins(publish),
+  generateNotes: decoratePlugins(generateNotes),
   verifyConditions: decoratePlugins(verifyConditions),
 };
