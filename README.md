@@ -65,8 +65,6 @@ E.g., `package.json`:
 }
 ```
 
-[Other ways of configuring `branch`.](https://github.com/semantic-release/semantic-release/blob/caribou/docs/usage/configuration.md#configuration.)
-
 #### Advanced
 
 Due to limitations in how plugins may be composed, `semantic-release-github-pr` must unfortunately hard-code the [`analyzeCommits` plugin](#analyzecommits) (see discussion [here](https://github.com/semantic-release/semantic-release/issues/550)).
@@ -117,7 +115,7 @@ Running `semantic-release-github-pr` is equivalent to running `semantic-release`
 {
   "release": {
     "analyzeCommits": "semantic-release-github-pr",
-    "publish": "semantic-release-github-pr",
+    "generateNotes": "semantic-release-github-pr",
     "verifyConditions": [
       "@semantic-release/github",
       "semantic-release-github-pr"
@@ -128,7 +126,7 @@ Running `semantic-release-github-pr` is equivalent to running `semantic-release`
 
 #### verifyConditions
 
-Used as a hook for cleaning up previous changelog PR comments made by the `publish` plugin, keeping it from flooding a PR with (eventually stale) changelog comments over time.
+Used as a hook for cleaning up previous changelog PR comments made by the `generateNotes` plugin, keeping it from flooding a PR with (eventually stale) changelog comments over time.
 
 It's recommended to pair this package's `verifyConditions` with that of [`@semantic-release/github`](https://github.com/semantic-release/github#verifyconditions).
 
@@ -138,6 +136,6 @@ Used as a hook to create a "no release" comment on a matching PR, if `semantic-r
 
 See the [`Release config`](#release-config) section for how to configure a custom `analyzeCommits` plugin and/or set options.
 
-#### publish
+#### generateNotes
 
 Creates a comment on matching PRs with the changelog for the release that would result from merging.
