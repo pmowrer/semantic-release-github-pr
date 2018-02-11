@@ -36,7 +36,7 @@ const analyzeCommits = wrapPlugin(
     const { dryRun, githubRepo, pullRequests } = pluginConfig;
     const nextRelease = await plugin(pluginConfig, config);
 
-    if (!nextRelease && !dryRun) {
+    if (!nextRelease) {
       await pullRequests.forEach(async pr => {
         const { number } = pr;
         const createChangelogOnPr = createChangelog(pluginConfig, config);
