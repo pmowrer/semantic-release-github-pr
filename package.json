@@ -31,7 +31,7 @@
     "jest": "^22.0.4",
     "lint-staged": "^6.0.0",
     "prettier": "^1.8.2",
-    "semantic-release": "^12.2.5"
+    "semantic-release": "^12.4.1"
   },
   "lint-staged": {
     "*.js": ["yarn format", "git add"]
