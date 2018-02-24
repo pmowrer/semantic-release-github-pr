@@ -1,6 +1,6 @@
 const { compose } = require('ramda');
 const { wrapPlugin } = require('semantic-release-plugin-decorators');
-const pluginDefinitions = require('semantic-release/lib/plugins/definitions');
+const pluginDefinitions = require('semantic-release/lib/definitions/plugins');
 
 const { parse } = require('./comment-tag');
 const createChangelog = require('./create-changelog');
