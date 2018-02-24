@@ -1,8 +1,7 @@
 {
   "name": "semantic-release-github-pr",
   "version": "0.0.0-development",
-  "description":
-    " A `semantic-release` plugin that creates a changelog comment on Github PRs.",
+  "description": " A `semantic-release` plugin that creates a changelog comment on Github PRs.",
   "main": "src/index.js",
   "repository": "https://github.com/Updater/semantic-release-github-pr.git",
   "scripts": {
@@ -14,7 +13,7 @@
   "bin": "./bin/semantic-release-github-pr.js",
   "license": "MIT",
   "peerDependencies": {
-    "semantic-release": "12.2.5 - 13.2.0"
+    "semantic-release": "^13.4.1 - ^15.0.0"
   },
   "dependencies": {
     "execa": "^0.8.0",
@@ -31,9 +30,12 @@
     "jest": "^22.0.4",
     "lint-staged": "^6.0.0",
     "prettier": "^1.8.2",
-    "semantic-release": "^13.2.0"
+    "semantic-release": "^15.0.0"
   },
   "lint-staged": {
-    "*.js": ["yarn format", "git add"]
+    "*.js": [
+      "yarn format",
+      "git add"
+    ]
   }
 }
