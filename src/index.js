@@ -4,7 +4,7 @@ const pluginDefinitions = require('semantic-release/lib/definitions/plugins');
 
 const { parse } = require('./comment-tag');
 const createChangelog = require('./create-changelog');
-const deleteChangelog = require('./delete-changelog');
+const deleteStaleChangelogs = require('./delete-changelog');
 const withGithub = require('./with-github');
 const withGitHead = require('./with-git-head');
 const withNpmPackage = require('./with-npm-package');
@@ -19,13 +19,6 @@ const decoratePlugins = compose(
   withNpmPackage
 );
 
-// Use `verifyConditions` plugin as a hook to clean up stale changelog comments.
-// We can't do this in `generateNotes` since it only runs if there's a new release.
-const verifyConditions = async (pluginConfig, config) => {
-  const { pullRequests } = pluginConfig;
-  await pullRequests.forEach(deleteChangelog(pluginConfig, config));
-};
-
 // Use `analyzeCommits` plugin as a hook to post a "no release" PR comment if
 // there isn't a new release. We can't do this in `generateNotes` since it only runs
 // if there's a new release.
@@ -33,7 +26,7 @@ const analyzeCommits = wrapPlugin(
   NAMESPACE,
   'analyzeCommits',
   plugin => async (pluginConfig, config) => {
-    const { dryRun, githubRepo, pullRequests } = pluginConfig;
+    const { githubRepo, pullRequests } = pluginConfig;
     const nextRelease = await plugin(pluginConfig, config);
 
     if (!nextRelease) {
@@ -52,6 +45,12 @@ const analyzeCommits = wrapPlugin(
         }
       });
     }
+
+    // Clean up stale changelog comments, possibly sparing the "no release"
+    // comment if this package doesn't have a new release.
+    await pullRequests.forEach(
+      deleteStaleChangelogs(!!nextRelease)(pluginConfig, config)
+    );
 
     return nextRelease;
   },
@@ -80,5 +79,4 @@ const generateNotes = wrapPlugin(
 module.exports = {
   analyzeCommits: decoratePlugins(analyzeCommits),
   generateNotes: decoratePlugins(generateNotes),
-  verifyConditions: decoratePlugins(verifyConditions),
 };

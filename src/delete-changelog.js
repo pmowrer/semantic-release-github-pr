@@ -11,10 +11,15 @@ const { parse } = require('./comment-tag');
  * always be wiped because we'd only want a single one in any scenario.
  * @param {String} gitHead
  * @param {String} npmPackageName
+ * @param {Boolean} skipNoRelease Whether to delete "no release" comments.
  * @returns {Function} Returns a predicate function accepting a string to match
  * for a stale comment.
  */
-const matchStaleComment = (gitHead, npmPackageName) => comment => {
+const matchStaleComment = (
+  gitHead,
+  npmPackageName,
+  skipNoRelease
+) => comment => {
   const result = parse(comment);
 
   debug(`Comment is a PR changelog: %o`, !!result);
@@ -30,7 +35,9 @@ const matchStaleComment = (gitHead, npmPackageName) => comment => {
   debug(`Comment matches npm package name: %o`, matchesPackageName);
   debug(`Comment is "no release" comment: %o`, isNoRelease);
 
-  return !matchesGitHead || matchesPackageName || isNoRelease;
+  return (
+    !matchesGitHead || matchesPackageName || (!skipNoRelease && isNoRelease)
+  );
 };
 
 /**
@@ -38,16 +45,17 @@ const matchStaleComment = (gitHead, npmPackageName) => comment => {
  * comments posted by this plugin (using `commentTag`) and delete them.
  *
  * Returns a function accepting a Github PR object (as returned by the Github API).
- *
- * @param pluginConfig
- * @param config
  */
-const deleteChangelog = (
+const deleteStaleChangelogs = skipNoRelease => (
   { githubRepo, npmPackage: { name: npmPackageName } },
   { logger, nextRelease: { gitHead } }
 ) => async ({ number, title }) => {
   const { data: comments } = await githubRepo.getIssueComments({ number });
-  const isStaleComment = matchStaleComment(gitHead, npmPackageName);
+  const isStaleComment = matchStaleComment(
+    gitHead,
+    npmPackageName,
+    skipNoRelease
+  );
 
   comments.forEach(async ({ id, body }) => {
     debug(`Checking PR comment %o for stale changelog message...`, id);
@@ -58,4 +66,4 @@ const deleteChangelog = (
   });
 };
 
-module.exports = deleteChangelog;
+module.exports = deleteStaleChangelogs;

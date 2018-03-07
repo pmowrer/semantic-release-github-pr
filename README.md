@@ -20,13 +20,13 @@ npm install -D semantic-release@next semantic-release-github-pr
 npx semantic-release-github-pr
 ```
 
-It helps to think about `semantic-releaase-github-pr` as a variation on `semantic-release`'s default behavior, using the latter's plugin system to modify some behaviors:
+It helps to think about `semantic-release-github-pr` as a variation on `semantic-release`'s default behavior, using the latter's plugin system to modify some behaviors:
 
 * If a new release would result from running `semantic-release`, _instead of publishing a new release of a package to `npm`_, it posts a comment with the changelog to matching Github PRs.
 
 * It posts a static message when there's no release (for clarity).
 
-* At the beginning of each run, it cleans up any PR comments it previously made (to keep from flooding PRs or leaving outdated information).
+* It cleans up any PR comments it previously made (to keep from flooding PRs or leaving outdated information).
 
 ### Which PRs get a comment?
 
@@ -67,9 +67,9 @@ E.g., `package.json`:
 
 #### Advanced
 
-Due to limitations in how plugins may be composed, `semantic-release-github-pr` must unfortunately hard-code the [`analyzeCommits` plugin](#analyzecommits) (see discussion [here](https://github.com/semantic-release/semantic-release/issues/550)).
+Due to limitations in how plugins may be composed, `semantic-release-github-pr` must unfortunately hard-code the [`analyzeCommits`](#analyzecommits) and [`generateNotes`](#generatenotes) [plugins](https://github.com/semantic-release/semantic-release/blob/caribou/docs/usage/plugins.md) (see discussion [here](https://github.com/semantic-release/semantic-release/issues/550)).
 
-Users may still want to define a custom `analyzeCommits` plugin, or want to pass options to the default [`analyzeCommits` plugin](https://github.com/semantic-release/commit-analyzer/). To work around this problem, set the desired `analyzeCommits` configuration in the [release plugin config](https://github.com/semantic-release/semantic-release#plugins) inside the `githubPr` key instead.
+Users may still want to define a custom versions of these plugins, or want to pass options to the default implementations. To work around this problem, set the desired configuration in the [release plugin config](https://github.com/semantic-release/semantic-release#plugins) inside the `githubPr` key instead.
 
 E.g., `package.json`:
 
@@ -77,7 +77,8 @@ E.g., `package.json`:
 {
   "release": {
     "githubPr": {
-      "analyzeCommits": "myCommitsAnalyzer"
+      "analyzeCommits": "myCommitsAnalyzer",
+      "generateNotes": "myGenerateNotes"
     }
   }
 }
@@ -115,27 +116,24 @@ Running `semantic-release-github-pr` is equivalent to running `semantic-release`
 {
   "release": {
     "analyzeCommits": "semantic-release-github-pr",
-    "generateNotes": "semantic-release-github-pr",
-    "verifyConditions": [
-      "@semantic-release/github",
-      "semantic-release-github-pr"
-    ]
+    "generateNotes": "semantic-release-github-pr"
   }
 }
 ```
 
-#### verifyConditions
-
-Used as a hook for cleaning up previous changelog PR comments made by the `generateNotes` plugin, keeping it from flooding a PR with (eventually stale) changelog comments over time.
-
-It's recommended to pair this package's `verifyConditions` with that of [`@semantic-release/github`](https://github.com/semantic-release/github#verifyconditions).
-
 #### analyzeCommits
+Used as a hook to clean up previous changelog PR comments made by the `generateNotes` plugin, keeping it from flooding a PR with (eventually stale) changelog comments over time.
 
-Used as a hook to create a "no release" comment on a matching PR, if `semantic-release` determines that there's no new version. Doesn't actually analyze commits itself, but decorates an `analyzeCommits` implementation ([`@semantic-release/commit-analyzer`](https://github.com/semantic-release/commit-analyzer/) by default).
+If `semantic-release` determines that there's no new version, this plugin will also post a "no release" comment on a matching PR. 
+
+This plugin doesn't actually analyze commits to determine when to make a release, but defers to the plugin it decorates ([`@semantic-release/commit-analyzer`](https://github.com/semantic-release/commit-analyzer/) by default).
 
 See the [`Release config`](#release-config) section for how to configure a custom `analyzeCommits` plugin and/or set options.
 
 #### generateNotes
 
 Creates a comment on matching PRs with the changelog for the release that would result from merging.
+
+This plugin doesn't actually generate the changelog that ends up in the PR comment, but defers to the plugin it decorates ([`@semantic-release/release-notes-generator`](https://github.com/semantic-release/release-notes-generator) by default).
+
+See the [`Release config`](#release-config) section for how to configure a custom `generateNotes` plugin and/or set options.
