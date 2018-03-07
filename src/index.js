@@ -49,7 +49,7 @@ const analyzeCommits = wrapPlugin(
     // Clean up stale changelog comments, possibly sparing the "no release"
     // comment if this package doesn't have a new release.
     await pullRequests.forEach(
-      deleteStaleChangelogs(!!nextRelease)(pluginConfig, config)
+      deleteStaleChangelogs(!nextRelease)(pluginConfig, config)
     );
 
     return nextRelease;
