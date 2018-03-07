@@ -22,7 +22,6 @@ const { getCurrentBranchName } = require('../src/git-utils');
     `--branch=${branch}`,
     `--analyze-commits=${plugins}`,
     `--generate-notes=${plugins}`,
-    `--verify-conditions=@semantic-release/github,${plugins}`,
   ]);
 
   execa('semantic-release', args, { stdio: 'inherit' });
