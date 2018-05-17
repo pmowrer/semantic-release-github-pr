@@ -77,6 +77,7 @@ const generateNotes = wrapPlugin(
 );
 
 module.exports = {
+  verifyConditions: '@semantic-release/github',
   analyzeCommits: decoratePlugins(analyzeCommits),
   generateNotes: decoratePlugins(generateNotes),
 };
