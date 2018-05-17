@@ -20,8 +20,13 @@ const { getCurrentBranchName } = require('../src/git-utils');
     // Set `dry-run` to keep `semantic-release` from publishing an actual release.
     `--dry-run`,
     `--branch=${branch}`,
+    // We hard-set our versions of `analyze-commits` and `generate-notes`.
     `--analyze-commits=${plugins}`,
     `--generate-notes=${plugins}`,
+    // We use `extends` here to pick up a soft-set default for `verifyConditions`,
+    // allowing users to override it (setting a plugin directly from the CLI
+    // trumps plugins read from a config file).
+    `--extends=${plugins}`,
   ]);
 
   execa('semantic-release', args, { stdio: 'inherit' });

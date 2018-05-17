@@ -32,14 +32,14 @@ It helps to think about `semantic-release-github-pr` as a variation on `semantic
 
 A PR gets a comment if:
 
-1. The PR's "from" branch matches the current branch (that this command is being run against).
+1.  The PR's "from" branch matches the current branch (that this command is being run against).
 
-   To cover multiple CI scenarios ([see below](#ci)), either of:
+    To cover multiple CI scenarios ([see below](#ci)), either of:
 
-   1. The PR's [_test_ merge commit](https://developer.github.com/v3/pulls/#response-1) matches the current branch's `git` HEAD.
-   2. The PR and the current branch have the same `git` HEAD.
+    1.  The PR's [_test_ merge commit](https://developer.github.com/v3/pulls/#response-1) matches the current branch's `git` HEAD.
+    2.  The PR and the current branch have the same `git` HEAD.
 
-2. The PR's base branch matches `master` (default) unless the [`githubPr.branch` configuration option](https://github.com/semantic-release/semantic-release#Release-config) is set.
+2.  The PR's base branch matches `master` (default) unless the [`githubPr.branch` configuration option](https://github.com/semantic-release/semantic-release#Release-config) is set.
 
 ## Configuration
 
@@ -115,16 +115,22 @@ Running `semantic-release-github-pr` is equivalent to running `semantic-release`
 ```json
 {
   "release": {
+    "verifyConditions": "@semantic-release/github",
     "analyzeCommits": "semantic-release-github-pr",
     "generateNotes": "semantic-release-github-pr"
   }
 }
 ```
 
+### verifyConditions
+
+The `@semantic-release/github` plugin is set as a default.
+
 #### analyzeCommits
+
 Used as a hook to clean up previous changelog PR comments made by the `generateNotes` plugin, keeping it from flooding a PR with (eventually stale) changelog comments over time.
 
-If `semantic-release` determines that there's no new version, this plugin will also post a "no release" comment on a matching PR. 
+If `semantic-release` determines that there's no new version, this plugin will also post a "no release" comment on a matching PR.
 
 This plugin doesn't actually analyze commits to determine when to make a release, but defers to the plugin it decorates ([`@semantic-release/commit-analyzer`](https://github.com/semantic-release/commit-analyzer/) by default).
 
