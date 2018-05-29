@@ -3,7 +3,7 @@
   "version": "0.0.0-development",
   "description": " A `semantic-release` plugin that creates a changelog comment on Github PRs.",
   "main": "src/index.js",
-  "files": ["src"],
+  "files": ["src", "bin"],
   "repository": "https://github.com/Updater/semantic-release-github-pr.git",
   "scripts": {
     "format": "prettier --write --single-quote --trailing-comma es5",
