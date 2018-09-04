@@ -8,12 +8,12 @@ const { gitHead: getGitHead } = require('semantic-release/lib/git');
  * https://github.com/semantic-release/semantic-release/blob/754b420fd6f26444eea53155fc0dbd08a51b4dcb/index.js#L38
  * @param plugin
  */
-const withGitHead = plugin => async (pluginConfig, config) => {
-  const { nextRelease } = config;
+const withGitHead = plugin => async (pluginConfig, context) => {
+  const { nextRelease } = context;
   const gitHead = nextRelease ? nextRelease.gitHead : await getGitHead();
 
   return plugin(pluginConfig, {
-    ...config,
+    ...context,
     nextRelease: {
       ...nextRelease,
       gitHead,

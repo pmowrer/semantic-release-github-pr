@@ -25,14 +25,14 @@ const decoratePlugins = compose(
 const analyzeCommits = wrapPlugin(
   NAMESPACE,
   'analyzeCommits',
-  plugin => async (pluginConfig, config) => {
+  plugin => async (pluginConfig, context) => {
     const { githubRepo, pullRequests } = pluginConfig;
-    const nextRelease = await plugin(pluginConfig, config);
+    const nextRelease = await plugin(pluginConfig, context);
 
     if (!nextRelease) {
       await pullRequests.forEach(async pr => {
         const { number } = pr;
-        const createChangelogOnPr = createChangelog(pluginConfig, config);
+        const createChangelogOnPr = createChangelog(pluginConfig, context);
         const { data: comments } = await githubRepo.getIssueComments({
           number,
         });
@@ -49,7 +49,7 @@ const analyzeCommits = wrapPlugin(
     // Clean up stale changelog comments, possibly sparing the "no release"
     // comment if this package doesn't have a new release.
     await pullRequests.forEach(
-      deleteStaleChangelogs(!nextRelease)(pluginConfig, config)
+      deleteStaleChangelogs(!nextRelease)(pluginConfig, context)
     );
 
     return nextRelease;
@@ -60,15 +60,15 @@ const analyzeCommits = wrapPlugin(
 const generateNotes = wrapPlugin(
   NAMESPACE,
   'generateNotes',
-  plugin => async (pluginConfig, config) => {
+  plugin => async (pluginConfig, context) => {
     const { pullRequests } = pluginConfig;
-    const { nextRelease } = config;
+    const { nextRelease } = context;
 
-    nextRelease.notes = await plugin(pluginConfig, config);
+    nextRelease.notes = await plugin(pluginConfig, context);
 
     await pullRequests.forEach(
       // Create "release" comment
-      createChangelog(pluginConfig, { ...config, nextRelease })
+      createChangelog(pluginConfig, { ...context, nextRelease })
     );
 
     return nextRelease.notes;
