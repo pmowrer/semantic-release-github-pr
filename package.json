@@ -14,7 +14,7 @@
   "bin": "./bin/semantic-release-github-pr.js",
   "license": "MIT",
   "peerDependencies": {
-    "semantic-release": "13.4.1 - 15.x.x"
+    "semantic-release": "13.4.1 - 15.6.x"
   },
   "dependencies": {
     "execa": "^0.8.0",
