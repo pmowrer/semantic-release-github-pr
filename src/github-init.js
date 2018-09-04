@@ -7,11 +7,12 @@ const { parse } = require('url');
  * https://github.com/semantic-release/github/blob/d49ce22a7c2d4b0861de31ba00c0b213b23e5051/lib/publish.js#L11
  *
  * @param pluginConfig The config object passed to `semantic-release` plugins.
+ * @param context The context object passed to `semantic-release` plugins.
  * @returns An initialized instance of `github`.
  */
-module.exports = pluginConfig => {
+module.exports = (pluginConfig, context) => {
   const { githubToken, githubUrl, githubApiPathPrefix } = resolveConfig(
-    pluginConfig
+    pluginConfig, context
   );
 
   let { port, protocol, hostname: host } = githubUrl ? parse(githubUrl) : {};
