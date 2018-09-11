@@ -1,5 +1,6 @@
 const resolveConfig = require('@semantic-release/github/lib/resolve-config');
 const GitHubApi = require('github');
+const { parse } = require('url');
 
 /**
  * Implementation lifted from `semantic-release`'s default Github plugin:
