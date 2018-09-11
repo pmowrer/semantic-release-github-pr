@@ -1,5 +1,8 @@
 const { compose } = require('ramda');
-const { wrapPlugin } = require('semantic-release-plugin-decorators');
+const {
+  wrapPlugin,
+  appendMultiPlugin,
+} = require('semantic-release-plugin-decorators');
 const pluginDefinitions = require('semantic-release/lib/definitions/plugins');
 
 const { parse } = require('./comment-tag');
@@ -12,7 +15,7 @@ const withMatchingPullRequests = require('./with-matching-pull-requests');
 
 const NAMESPACE = 'githubPr';
 
-const decoratePlugins = compose(
+const decoratePlugin = compose(
   withGithub,
   withGitHead,
   withMatchingPullRequests,
@@ -57,27 +60,27 @@ const analyzeCommits = wrapPlugin(
   pluginDefinitions.analyzeCommits.default
 );
 
-const generateNotes = wrapPlugin(
+// Append a plugin that generates PR comments from the release notes resulting
+// from the configured `generateNotes` plugins that run ahead of it.
+const generateNotes = appendMultiPlugin(
   NAMESPACE,
   'generateNotes',
-  plugin => async (pluginConfig, context) => {
+  decoratePlugin(async (pluginConfig, context) => {
     const { pullRequests } = pluginConfig;
     const { nextRelease } = context;
 
-    nextRelease.notes = await plugin(pluginConfig, context);
-
     await pullRequests.forEach(
       // Create "release" comment
-      createChangelog(pluginConfig, { ...context, nextRelease })
+      createChangelog(pluginConfig, context)
     );
 
     return nextRelease.notes;
-  },
+  }),
   pluginDefinitions.generateNotes.default
 );
 
 module.exports = {
   verifyConditions: '@semantic-release/github',
-  analyzeCommits: decoratePlugins(analyzeCommits),
-  generateNotes: decoratePlugins(generateNotes),
+  analyzeCommits: decoratePlugin(analyzeCommits),
+  generateNotes,
 };
