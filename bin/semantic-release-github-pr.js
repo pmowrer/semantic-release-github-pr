@@ -20,9 +20,16 @@ const { getCurrentBranchName } = require('../src/git-utils');
     // Set `dry-run` to keep `semantic-release` from publishing an actual release.
     `--dry-run`,
     `--branch=${branch}`,
-    // We hard-set our versions of `analyze-commits` and `generate-notes`.
+    // We hard-set our version of `analyze-commits (preventing accidental override)`.
     `--analyze-commits=${plugins}`,
-    `--generate-notes=${plugins}`,
+
+    // TODO: Used to hard-set our version of `generateNotes` as well, but no
+    // longer seems possible after it became a "multi plugin" (array)
+    // configuration in `semantic-release` 15.7.0. Instead, it's soft-set set
+    // via the shareable config option below (`--extends`). It doesn't matter
+    // other than it allows the user to break the plugin by (inadvertently)
+    // overriding our version of `generateNotes`.
+
     // We use `extends` here to pick up a soft-set default for `verifyConditions`,
     // allowing users to override it (setting a plugin directly from the CLI
     // trumps plugins read from a config file).
