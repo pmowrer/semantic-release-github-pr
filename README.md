@@ -11,7 +11,7 @@ This set of [`semantic-release`](https://github.com/semantic-release/semantic-re
 ## Install
 
 ```bash
-npm install -D semantic-release@next semantic-release-github-pr
+npm install -D semantic-release semantic-release-github-pr
 ```
 
 ## Usage
