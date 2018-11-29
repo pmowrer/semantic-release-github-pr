@@ -4,9 +4,7 @@ const create = (gitHead, packageName, gitTag = null) => {
   // There isn't a built-in concept of a markdown comment.
   // We interpret this format as a markdown comment: [//]: # (message)
   // https://stackoverflow.com/questions/4823468/comments-in-markdown/20885980#20885980
-  return `[//]: # (semantic-release-github-pr ${gitHead} ${packageName} ${
-    gitTag
-  })`;
+  return `[//]: # (semantic-release-github-pr ${gitHead} ${packageName} ${gitTag})`;
 };
 
 const PARSE_REGEXP = /\[\/\/\]: # \(semantic-release-github-pr( [^\)]+)+\)/;
