@@ -1,4 +1,17 @@
-const { gitHead: getGitHead } = require('semantic-release/lib/git');
+const {
+  /**
+   * in semantic-release <= 15.12.0 this function is exported as gitHead, as of
+   * semantic-release@15.12.1 this function is exported as getGitHead, here we
+   * try to destructure both, and use the new one if the old one doesn't exist
+   *
+   * @see: https://github.com/semantic-release/semantic-release/compare/v15.12.0...v15.12.1
+   * @see: https://github.com/semantic-release/semantic-release/commit/9f5645cfa0a6315149072b5b1c1c7f5bb5eb1fe2
+   */
+  gitHead: maybeGitHead,
+  getGitHead: maybeGetGitHead,
+} = require('semantic-release/lib/git');
+
+let getGitHead = maybeGitHead !== undefined ? maybeGitHead : maybeGetGitHead;
 
 /**
  * Plugin wrapper that ensures that `nextRelease.gitHead` is available.
