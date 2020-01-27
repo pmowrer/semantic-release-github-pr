@@ -4,7 +4,9 @@ const parseGithubUrl = require('parse-github-url');
 
 const withGithub = plugin => (pluginConfig, context) => {
   const github = githubInit(pluginConfig, context);
-  const { options: { repositoryUrl } } = context;
+  const {
+    options: { repositoryUrl },
+  } = context;
   const { name: repo, owner } = parseGithubUrl(repositoryUrl);
 
   return plugin(

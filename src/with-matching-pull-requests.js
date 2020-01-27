@@ -3,7 +3,10 @@ const { getCurrentBranchName } = require('./git-utils');
 
 const withMatchingPullRequests = plugin => async (pluginConfig, context) => {
   const { githubRepo } = pluginConfig;
-  const { nextRelease: { gitHead }, options: { branch } } = context;
+  const {
+    nextRelease: { gitHead },
+    options: { branch },
+  } = context;
   const matchingPrFilter = isMatchingPullRequestFor(gitHead);
   const { data: openPullRequests = [] } = await githubRepo.getAllPullRequests({
     // Determine whether the user provided a custom `branch` value.

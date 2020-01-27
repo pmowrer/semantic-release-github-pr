@@ -36,5 +36,5 @@ const { getCurrentBranchName } = require('../src/git-utils');
     `--extends=${plugins}`,
   ]);
 
-  execa('semantic-release', args, { stdio: 'inherit' });
+  execa('semantic-release', args, { stdio: 'inherit', preferLocal: true });
 })();
