@@ -20,6 +20,8 @@
     "semantic-release": "^15.7.0-15.9.x"
   },
   "dependencies": {
+    "debug": "^4.1.1",
+    "env-ci": "^5.0.1",
     "execa": "^0.8.0",
     "github": "^12.1.0",
     "parse-github-url": "^1.0.1",
@@ -28,8 +30,6 @@
     "semantic-release-plugin-decorators": "^2.0.0"
   },
   "devDependencies": {
-    "debug": "^3.1.0",
-    "env-ci": "^1.4.0",
     "husky": "^0.14.3",
     "jest": "^22.0.4",
     "lint-staged": "^6.0.0",
