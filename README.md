@@ -1,6 +1,6 @@
 # semantic-release-github-pr
 
-[![Build Status](https://travis-ci.org/Updater/semantic-release-github-pr.svg?branch=master)](https://travis-ci.org/Updater/semantic-release-github-pr) [![npm](https://img.shields.io/npm/v/semantic-release-github-pr.svg)](https://www.npmjs.com/package/semantic-release-github-pr) [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
+[![Build Status](https://travis-ci.org/pmowrer/semantic-release-github-pr.svg?branch=master)](https://travis-ci.org/pmowrer/semantic-release-github-pr) [![npm](https://img.shields.io/npm/v/semantic-release-github-pr.svg)](https://www.npmjs.com/package/semantic-release-github-pr) [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
 
 Preview the semantic release notes that would result from merging a Github PR.
 
@@ -11,8 +11,10 @@ This set of [`semantic-release`](https://github.com/semantic-release/semantic-re
 ## Install
 
 ```bash
-npm install -D semantic-release@next semantic-release-github-pr
+npm install -D semantic-release@~15.9.x semantic-release-github-pr
 ```
+
+NOTE: The current version of this plugin only supports `semantic-release` versions 15.7.x-15.9.x. The next major version will support the current version of `semantic-release`.
 
 ## Usage
 
