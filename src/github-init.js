@@ -12,7 +12,8 @@ const { parse } = require('url');
  */
 module.exports = (pluginConfig, context) => {
   const { githubToken, githubUrl, githubApiPathPrefix } = resolveConfig(
-    pluginConfig, context
+    pluginConfig,
+    context
   );
 
   let { port, protocol, hostname: host } = githubUrl ? parse(githubUrl) : {};
