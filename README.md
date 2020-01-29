@@ -6,15 +6,13 @@ Preview the semantic release notes that would result from merging a Github PR.
 
 ![image](https://user-images.githubusercontent.com/356320/33625928-257bc906-d9c7-11e7-9adb-de85726952eb.png)
 
-This set of [`semantic-release`](https://github.com/semantic-release/semantic-release) plugins will post a Github PR comment with a preview of the release that would result from merging.
+This [`semantic-release`](https://github.com/semantic-release/semantic-release) plugin will post a Github PR comment with a preview of the release that would result from merging.
 
 ## Install
 
 ```bash
-npm install -D semantic-release@~15.9.x semantic-release-github-pr
+npm install -D semantic-release semantic-release-github-pr
 ```
-
-NOTE: The current version of this plugin only supports `semantic-release` versions 15.7.x-15.9.x. The next major version will support the current version of `semantic-release`.
 
 ## Usage
 
@@ -24,7 +22,7 @@ npx semantic-release-github-pr
 
 It helps to think about `semantic-release-github-pr` as a variation on `semantic-release`'s default behavior, using the latter's plugin system to modify some behaviors:
 
-* If a new release would result from running `semantic-release`, _instead of publishing a new release of a package to `npm`_, it posts a comment with the changelog to matching Github PRs.
+* If a new release would result from running `semantic-release`, _instead of publishing a new release of a package_, it posts a comment with the changelog to matching Github PRs.
 
 * It posts a static message when there's no release (for clarity).
 
@@ -34,14 +32,14 @@ It helps to think about `semantic-release-github-pr` as a variation on `semantic
 
 A PR gets a comment if:
 
-1.  The PR's "from" branch matches the current branch (that this command is being run against).
+1.  The PR's _from_ branch matches the current branch (that this plugin is being run on).
 
     To cover multiple CI scenarios ([see below](#ci)), either of:
 
     1.  The PR's [_test_ merge commit](https://developer.github.com/v3/pulls/#response-1) matches the current branch's `git` HEAD.
     2.  The PR and the current branch have the same `git` HEAD.
 
-2.  The PR's base branch matches `master` (default) unless the [`githubPr.branch` configuration option](https://github.com/semantic-release/semantic-release#Release-config) is set.
+2.  The PR's base branch matches `master` (default) unless otherwise configured via the `baseBranch` option.
 
 ## Configuration
 
@@ -49,39 +47,18 @@ It is assumed the user is already fully familiar with `semantic-release` and [`i
 
 ### Github
 
-Github authentication must be configured, exactly the same as for `semantic-relase`'s default [`@semantic-release/github`](https://github.com/semantic-release/github/#github-repository-authentication) plugin.
+Github authentication must be configured, exactly the same as for `semantic-relase`'s default [`@semantic-release/github`](https://github.com/semantic-release/github/#github-authentication) plugin. PR comments will be posted by the associated GitHub user.
 
 ### Release config
 
-It's possible to configure the expected base branch [when matching a PR](#which-prs-get-a-comment).
+It's possible to configure the expected base branch [when matching a PR](#which-prs-get-a-comment) via a `baseBranch` option set in the [release config](https://github.com/semantic-release/semantic-release/blob/master/docs/usage/configuration.md#configuration-file).
 
-E.g., `package.json`:
-
-```json
-{
-  "release": {
-    "githubPr": {
-      "branch": "staging"
-    }
-  }
-}
-```
-
-#### Advanced
-
-Due to limitations in how plugins may be composed, `semantic-release-github-pr` must unfortunately hard-code the [`analyzeCommits`](#analyzecommits) and [`generateNotes`](#generatenotes) [plugins](https://github.com/semantic-release/semantic-release/blob/caribou/docs/usage/plugins.md) (see discussion [here](https://github.com/semantic-release/semantic-release/issues/550)).
-
-Users may still want to define a custom versions of these plugins, or want to pass options to the default implementations. To work around this problem, set the desired configuration in the [release plugin config](https://github.com/semantic-release/semantic-release#plugins) inside the `githubPr` key instead.
-
-E.g., `package.json`:
+E.g., in a `package.json` release config:
 
 ```json
 {
   "release": {
-    "githubPr": {
-      "analyzeCommits": "myCommitsAnalyzer",
-      "generateNotes": "myGenerateNotes"
-    }
+    "baseBranch": "staging"
   }
 }
 ```
@@ -109,39 +86,3 @@ Unfortunately, CircleCI only supports building on push, [not when a PR is create
 post:
   - "[[ $CI_PULL_REQUEST != '' ]] && npx semantic-release-github-pr || exit 0"
 ```
-
-### Advanced
-
-Running `semantic-release-github-pr` is equivalent to running `semantic-release` with the following [configuration](https://github.com/semantic-release/semantic-release/blob/caribou/docs/usage/configuration.md#configuration.) (as encapsulated in [the `semantic-release-github-pr` command](https://github.com/Updater/semantic-release-github-pr/blob/master/bin/semantic-release-github-pr.js)):
-
-```json
-{
-  "release": {
-    "verifyConditions": "@semantic-release/github",
-    "analyzeCommits": "semantic-release-github-pr",
-    "generateNotes": "semantic-release-github-pr"
-  }
-}
-```
-
-### verifyConditions
-
-The `@semantic-release/github` plugin is set as a default.
-
-#### analyzeCommits
-
-Used as a hook to clean up previous changelog PR comments made by the `generateNotes` plugin, keeping it from flooding a PR with (eventually stale) changelog comments over time.
-
-If `semantic-release` determines that there's no new version, this plugin will also post a "no release" comment on a matching PR.
-
-This plugin doesn't actually analyze commits to determine when to make a release, but defers to the plugin it decorates ([`@semantic-release/commit-analyzer`](https://github.com/semantic-release/commit-analyzer/) by default).
-
-See the [`Release config`](#release-config) section for how to configure a custom `analyzeCommits` plugin and/or set options.
-
-#### generateNotes
-
-Creates a comment on matching PRs with the changelog for the release that would result from merging.
-
-This plugin doesn't actually generate the changelog that ends up in the PR comment, but defers to the plugin it decorates ([`@semantic-release/release-notes-generator`](https://github.com/semantic-release/release-notes-generator) by default).
-
-See the [`Release config`](#release-config) section for how to configure a custom `generateNotes` plugin and/or set options.

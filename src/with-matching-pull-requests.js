@@ -1,17 +1,15 @@
 const isMatchingPullRequestFor = require('./is-matching-pull-request-for');
-const { getCurrentBranchName } = require('./git-utils');
 
-const withMatchingPullRequests = plugin => async (pluginConfig, context) => {
+const withMatchingPullRequests = plugin => async (...args) => {
+  const [pluginConfig, context] = args;
   const { githubRepo } = pluginConfig;
   const {
-    nextRelease: { gitHead },
-    options: { branch },
+    envCi: { commit: gitHead },
+    options: { baseBranch },
   } = context;
   const matchingPrFilter = isMatchingPullRequestFor(gitHead);
   const { data: openPullRequests = [] } = await githubRepo.getAllPullRequests({
-    // Determine whether the user provided a custom `branch` value.
-    // If one wasn't provided, we default to "master".
-    base: (await getCurrentBranchName()) ? 'master' : branch,
+    base: !baseBranch ? 'master' : baseBranch,
     state: 'open',
   });
 
@@ -20,7 +18,7 @@ const withMatchingPullRequests = plugin => async (pluginConfig, context) => {
       ...pluginConfig,
       pullRequests: openPullRequests.filter(matchingPrFilter),
     },
-    context
+    ...args.slice(1)
   );
 };
 

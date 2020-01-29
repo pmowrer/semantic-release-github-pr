@@ -16,7 +16,7 @@
   "bin": "./bin/semantic-release-github-pr.js",
   "license": "MIT",
   "peerDependencies": {
-    "semantic-release": "^15.7.0-15.9.x"
+    "semantic-release": ">=16.0.0"
   },
   "dependencies": {
     "debug": "^4.1.1",
@@ -25,15 +25,14 @@
     "github": "^13.0.0",
     "parse-github-url": "^1.0.2",
     "ramda": "^0.26.1",
-    "read-pkg": "^5.2.0",
-    "semantic-release-plugin-decorators": "^2.0.0"
+    "read-pkg": "^5.2.0"
   },
   "devDependencies": {
     "husky": "^4.2.1",
     "jest": "^25.1.0",
     "lint-staged": "^10.0.3",
     "prettier": "^1.19.1",
-    "semantic-release": "15.9.x"
+    "semantic-release": "^17.0.0"
   },
   "husky": {
     "hooks": {
