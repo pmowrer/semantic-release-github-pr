@@ -36,7 +36,7 @@ const matchStaleComment = (
   debug(`Comment is "no release" comment: %o`, isNoRelease);
 
   return (
-    !matchesGitHead || matchesPackageName || (!skipNoRelease && isNoRelease)
+    (!matchesGitHead && matchesPackageName) || (!skipNoRelease && isNoRelease)
   );
 };
 
@@ -48,7 +48,7 @@ const matchStaleComment = (
  */
 const deleteStaleChangelogs = skipNoRelease => (
   { githubRepo, npmPackage: { name: npmPackageName } },
-  { logger, nextRelease: { gitHead } }
+  { logger, envCi: { commit: gitHead } }
 ) => async ({ number, title }) => {
   const { data: comments } = await githubRepo.getIssueComments({ number });
   const isStaleComment = matchStaleComment(

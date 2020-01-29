@@ -15,7 +15,11 @@ const HEADER = {
  */
 const createChangelog = (
   { githubRepo, npmPackage: { name: npmPackageName } },
-  { logger, nextRelease: { gitHead, gitTag = null, notes } }
+  {
+    logger,
+    envCi: { commit: gitHead },
+    nextRelease: { gitTag = null, notes } = {},
+  }
 ) => async ({ number, title }) => {
   const body =
     create(gitHead, npmPackageName, gitTag) +

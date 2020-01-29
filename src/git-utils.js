@@ -1,4 +1,3 @@
-const { pipeP, split } = require('ramda');
 const execa = require('execa');
 
 const git = async (args, options = {}) => {

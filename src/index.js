@@ -1,38 +1,26 @@
 const { compose } = require('ramda');
-const {
-  wrapPlugin,
-  appendMultiPlugin,
-} = require('semantic-release-plugin-decorators');
-const pluginDefinitions = require('semantic-release/lib/definitions/plugins');
-
 const { parse } = require('./comment-tag');
 const createChangelog = require('./create-changelog');
 const deleteStaleChangelogs = require('./delete-changelog');
 const withGithub = require('./with-github');
-const withGitHead = require('./with-git-head');
 const withNpmPackage = require('./with-npm-package');
 const withMatchingPullRequests = require('./with-matching-pull-requests');
 
-const NAMESPACE = 'githubPr';
-
 const decoratePlugin = compose(
   withGithub,
-  withGitHead,
   withMatchingPullRequests,
   withNpmPackage
 );
 
-// Use `analyzeCommits` plugin as a hook to post a "no release" PR comment if
-// there isn't a new release. We can't do this in `generateNotes` since it only runs
-// if there's a new release.
-const analyzeCommits = wrapPlugin(
-  NAMESPACE,
-  'analyzeCommits',
-  plugin => async (pluginConfig, context) => {
+// Use the `analyzeCommits` step to post a "no release" PR comment when there
+// isn't a new release (we can't do this in `generateNotes` since it only runs
+// if there's a new release).
+const analyzeCommits = async (pluginConfig, context, results) => {
+  return Promise.all(results).then(async results => {
     const { githubRepo, pullRequests } = pluginConfig;
-    const nextRelease = await plugin(pluginConfig, context);
+    const hasNextRelease = results.some(result => !!result);
 
-    if (!nextRelease) {
+    if (!hasNextRelease) {
       await pullRequests.forEach(async pr => {
         const { number } = pr;
         const createChangelogOnPr = createChangelog(pluginConfig, context);
@@ -40,47 +28,77 @@ const analyzeCommits = wrapPlugin(
           number,
         });
 
-        // Create "no release" comment if there are no other comments posted
-        // by this set of plugins. We want to avoid duplicating the "no release"
-        // comment and/or posting it when another package has a release (monorepo).
+        // Create a "no release" comment.
+        // We only do this if there are no other comments posted by this plugin,
+        // avoiding duplication of the "no release" comment and/or incorrectly posting
+        // it when a different package in the same PR has a release (monorepo).
         if (!comments.some(comment => !!parse(comment.body))) {
           createChangelogOnPr(pr);
         }
       });
     }
 
-    // Clean up stale changelog comments, possibly sparing the "no release"
-    // comment if this package doesn't have a new release.
+    // Clean up stale changelog comments from previous runs of this plugin.
     await pullRequests.forEach(
-      deleteStaleChangelogs(!nextRelease)(pluginConfig, context)
+      deleteStaleChangelogs(!hasNextRelease)(pluginConfig, context)
     );
 
-    return nextRelease;
-  },
-  pluginDefinitions.analyzeCommits.default
-);
+    return;
+  });
+};
 
-// Append a plugin that generates PR comments from the release notes resulting
-// from the configured `generateNotes` plugins that run ahead of it.
-const generateNotes = appendMultiPlugin(
-  NAMESPACE,
-  'generateNotes',
-  decoratePlugin(async (pluginConfig, context) => {
+// Use the "generateNotes" step to post a PR comments with the release notes
+// generated for the pending release.
+const generateNotes = async (pluginConfig, context, results) => {
+  return Promise.all(results).then(async results => {
     const { pullRequests } = pluginConfig;
     const { nextRelease } = context;
 
     await pullRequests.forEach(
-      // Create "release" comment
+      // Create a "release" comment.
       createChangelog(pluginConfig, context)
     );
 
     return nextRelease.notes;
-  }),
-  pluginDefinitions.generateNotes.default
-);
+  });
+};
+
+const appendStep = (stepName, stepFn) => {
+  const results = [];
+
+  return Array(10)
+    .fill(null)
+    .map((value, index) => {
+      return async (pluginConfig, context) => {
+        const {
+          options: { plugins },
+        } = context;
+        const pluginName = plugins[index];
+
+        if (index === plugins.length) {
+          return stepFn(pluginConfig, context, results);
+        }
+
+        if (!pluginName) {
+          return '';
+        }
+
+        const plugin = require(pluginName);
+        const step = plugin && plugin[stepName];
+
+        if (!step) {
+          return '';
+        }
+
+        const result = step(pluginConfig, context);
+        results.push(result);
+        return result;
+      };
+    });
+};
 
 module.exports = {
   verifyConditions: '@semantic-release/github',
-  analyzeCommits: decoratePlugin(analyzeCommits),
-  generateNotes,
+  analyzeCommits: appendStep('analyzeCommits', decoratePlugin(analyzeCommits)),
+  generateNotes: appendStep('generateNotes', decoratePlugin(generateNotes)),
 };
