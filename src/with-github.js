@@ -2,8 +2,7 @@ const githubInit = require('./github-init');
 const githubRepo = require('./github-repo');
 const parseGithubUrl = require('parse-github-url');
 
-const withGithub = plugin => (...args) => {
-  const [pluginConfig, context] = args;
+const withGithub = plugin => (pluginConfig, context) => {
   const github = githubInit(pluginConfig, context);
   const {
     options: { repositoryUrl },
@@ -15,7 +14,7 @@ const withGithub = plugin => (...args) => {
       ...pluginConfig,
       githubRepo: githubRepo(github, { owner, repo }),
     },
-    ...args.slice(1)
+    context
   );
 };
 
