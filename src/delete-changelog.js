@@ -36,7 +36,7 @@ const matchStaleComment = (
   debug(`Comment is "no release" comment: %o`, isNoRelease);
 
   return (
-    !matchesGitHead || matchesPackageName || (!skipNoRelease && isNoRelease)
+    (!matchesGitHead && matchesPackageName) || (!skipNoRelease && isNoRelease)
   );
 };
 
