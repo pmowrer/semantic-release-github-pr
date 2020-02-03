@@ -1,3 +1,4 @@
+const { appendStep } = require('semantic-release-plugin-decorators');
 const { compose } = require('ramda');
 const { parse } = require('./comment-tag');
 const createChangelog = require('./create-changelog');
@@ -15,86 +16,49 @@ const decoratePlugin = compose(
 // Use the `analyzeCommits` step to post a "no release" PR comment when there
 // isn't a new release (we can't do this in `generateNotes` since it only runs
 // if there's a new release).
-const analyzeCommits = async (pluginConfig, context, results) => {
-  return Promise.all(results).then(async results => {
-    const { githubRepo, pullRequests } = pluginConfig;
-    const hasNextRelease = results.some(result => !!result);
+const analyzeCommits = async (pluginConfig, context) => {
+  const { githubRepo, pullRequests } = pluginConfig;
+  const { stepResults } = context;
+  const hasNextRelease = stepResults.some(result => !!result);
 
-    if (!hasNextRelease) {
-      await pullRequests.forEach(async pr => {
-        const { number } = pr;
-        const createChangelogOnPr = createChangelog(pluginConfig, context);
-        const { data: comments } = await githubRepo.getIssueComments({
-          number,
-        });
-
-        // Create a "no release" comment.
-        // We only do this if there are no other comments posted by this plugin,
-        // avoiding duplication of the "no release" comment and/or incorrectly posting
-        // it when a different package in the same PR has a release (monorepo).
-        if (!comments.some(comment => !!parse(comment.body))) {
-          createChangelogOnPr(pr);
-        }
+  if (!hasNextRelease) {
+    await pullRequests.forEach(async pr => {
+      const { number } = pr;
+      const createChangelogOnPr = createChangelog(pluginConfig, context);
+      const { data: comments } = await githubRepo.getIssueComments({
+        number,
       });
-    }
 
-    // Clean up stale changelog comments from previous runs of this plugin.
-    await pullRequests.forEach(
-      deleteStaleChangelogs(!hasNextRelease)(pluginConfig, context)
-    );
+      // Create a "no release" comment.
+      // We only do this if there are no other comments posted by this plugin,
+      // avoiding duplication of the "no release" comment and/or incorrectly posting
+      // it when a different package in the same PR has a release (monorepo).
+      if (!comments.some(comment => !!parse(comment.body))) {
+        createChangelogOnPr(pr);
+      }
+    });
+  }
 
-    return;
-  });
+  // Clean up stale changelog comments from previous runs of this plugin.
+  await pullRequests.forEach(
+    deleteStaleChangelogs(!hasNextRelease)(pluginConfig, context)
+  );
+
+  return;
 };
 
 // Use the "generateNotes" step to post a PR comments with the release notes
 // generated for the pending release.
-const generateNotes = async (pluginConfig, context, results) => {
-  return Promise.all(results).then(async results => {
-    const { pullRequests } = pluginConfig;
-    const { nextRelease } = context;
+const generateNotes = async (pluginConfig, context) => {
+  const { pullRequests } = pluginConfig;
+  const { nextRelease } = context;
 
-    await pullRequests.forEach(
-      // Create a "release" comment.
-      createChangelog(pluginConfig, context)
-    );
+  await pullRequests.forEach(
+    // Create a "release" comment.
+    createChangelog(pluginConfig, context)
+  );
 
-    return nextRelease.notes;
-  });
-};
-
-const appendStep = (stepName, stepFn) => {
-  const results = [];
-
-  return Array(10)
-    .fill(null)
-    .map((value, index) => {
-      return async (pluginConfig, context) => {
-        const {
-          options: { plugins },
-        } = context;
-        const pluginName = plugins[index];
-
-        if (index === plugins.length) {
-          return stepFn(pluginConfig, context, results);
-        }
-
-        if (!pluginName) {
-          return '';
-        }
-
-        const plugin = require(pluginName);
-        const step = plugin && plugin[stepName];
-
-        if (!step) {
-          return '';
-        }
-
-        const result = step(pluginConfig, context);
-        results.push(result);
-        return result;
-      };
-    });
+  return nextRelease.notes;
 };
 
 module.exports = {

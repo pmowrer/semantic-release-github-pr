@@ -1,7 +1,6 @@
 const isMatchingPullRequestFor = require('./is-matching-pull-request-for');
 
-const withMatchingPullRequests = plugin => async (...args) => {
-  const [pluginConfig, context] = args;
+const withMatchingPullRequests = plugin => async (pluginConfig, context) => {
   const { githubRepo } = pluginConfig;
   const {
     envCi: { commit: gitHead },
@@ -18,7 +17,7 @@ const withMatchingPullRequests = plugin => async (...args) => {
       ...pluginConfig,
       pullRequests: openPullRequests.filter(matchingPrFilter),
     },
-    ...args.slice(1)
+    context
   );
 };
 
