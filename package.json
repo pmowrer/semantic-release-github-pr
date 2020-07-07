@@ -7,7 +7,7 @@
     "src",
     "bin"
   ],
-  "repository": "https://github.com/Updater/semantic-release-github-pr.git",
+  "repository": "https://github.com/pmowrer/semantic-release-github-pr.git",
   "scripts": {
     "format": "prettier --write --single-quote --trailing-comma es5",
     "format:all": "yarn format \"./**/*.js\"",
