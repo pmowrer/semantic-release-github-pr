@@ -64,5 +64,7 @@ const generateNotes = async (pluginConfig, context) => {
 module.exports = {
   verifyConditions: '@semantic-release/github',
   analyzeCommits: appendStep('analyzeCommits', decoratePlugin(analyzeCommits)),
-  generateNotes: appendStep('generateNotes', decoratePlugin(generateNotes)),
+  generateNotes: appendStep('generateNotes', decoratePlugin(generateNotes), {
+    defaultReturn: '',
+  }),
 };

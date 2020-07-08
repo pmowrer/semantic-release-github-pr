@@ -10,7 +10,7 @@ const { getCurrentBranchName } = require('../src/git-utils');
   const currentBranchName = await getCurrentBranchName();
   // If we're in a "detached HEAD" state, assume we're running on CI.
   const branch =
-    currentBranchName !== 'HEAD' ? currentBranchName : envCi().branch;
+    currentBranchName !== 'HEAD' ? currentBranchName : envCi().prBranch;
 
   const args = argv.slice(2).concat([
     // We want to run on pull request builds, but `semantic-release` won't
