@@ -67,6 +67,14 @@ E.g., in a `package.json` release config:
 
 This plugin is best used with a CI build process to fully automate the posting of comments in Github PRs. Ideally, it should run whenever a PR is opened/updated.
 
+#### GitHub Actions
+This plugin relies on `semantic-release`'s dry-run feature. Unfortunately, that feature is gated by strict run-time checks, including one that ensures that the branch `semantic-release` runs on is in the release configuration. It depends on [`env-ci`](https://github.com/semantic-release/env-ci) to enforce the checks in CI environments, which doesn't properly resolve the branch name when running in GitHub Actions, [requiring a workaround](https://github.com/semantic-release/semantic-release/issues/1890#issuecomment-974512960):
+
+```yaml
+    - run: git checkout -b ${{ github.head_ref }}
+    - run: unset GITHUB_ACTIONS && npx semantic-release-github-pr
+```
+
 #### Travis
 
 To only run when necessary, we use the [`$TRAVIS_PULL_REQUEST`](https://docs.travis-ci.com/user/environment-variables/#Convenience-Variables) environment variable to detect whether the build is a ["pull request build"](https://docs.travis-ci.com/user/pull-requests/).
