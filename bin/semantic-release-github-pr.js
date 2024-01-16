@@ -1,16 +1,12 @@
 #!/usr/bin/env node
 const execa = require('execa');
-const envCi = require('env-ci');
 const { argv } = process;
 const { resolve } = require('path');
 const { getCurrentBranchName } = require('../src/git-utils');
 
 (async function() {
   const plugins = `${resolve(__dirname, '../src/index.js')}`;
-  const currentBranchName = await getCurrentBranchName();
-  // If we're in a "detached HEAD" state, assume we're running on CI.
-  const branch =
-    currentBranchName !== 'HEAD' ? currentBranchName : envCi().prBranch;
+  const branch = await getCurrentBranchName();
 
   const args = argv.slice(2).concat([
     // We want to run on pull request builds, but `semantic-release` won't
